@@ -19,6 +19,7 @@ class SegmentioCell: UICollectionViewCell {
     var containerView: UIView?
     var imageContainerView: UIView?
     
+    var overrideTextColor: UIColor?
     var topConstraint: NSLayoutConstraint?
     var bottomConstraint: NSLayoutConstraint?
     var cellSelected = false
@@ -45,8 +46,12 @@ class SegmentioCell: UICollectionViewCell {
                         : defaultState.titleTextColor
                     let highlightedTitleFont = cellSelected ? selectedState.titleFont : defaultState.titleFont
                     
-                    segmentTitleLabel?.textColor = isHighlighted ? highlightedState.titleTextColor
-                        : highlightedTitleTextColor
+                    if let overrideTextColor = overrideTextColor {
+                        segmentTitleLabel?.textColor = overrideTextColor
+                    } else {
+                        segmentTitleLabel?.textColor = isHighlighted ? highlightedState.titleTextColor
+                            : highlightedTitleTextColor
+                    }
                     segmentTitleLabel?.font = isHighlighted ? highlightedState.titleFont : highlightedTitleFont
                 }
                 
@@ -139,7 +144,12 @@ class SegmentioCell: UICollectionViewCell {
         let defaultState = options.states.defaultState
         
         if style.isWithText() {
-            segmentTitleLabel?.textColor = selected ? selectedState.titleTextColor : defaultState.titleTextColor
+//            segmentTitleLabel?.textColor = selected ? selectedState.titleTextColor : defaultState.titleTextColor
+            if let overrideTextColor = overrideTextColor {
+                segmentTitleLabel?.textColor = overrideTextColor
+            } else {
+                segmentTitleLabel?.textColor = selected ? selectedState.titleTextColor : defaultState.titleTextColor
+            }
             segmentTitleLabel?.font = selected ? selectedState.titleFont : defaultState.titleFont
             segmentTitleLabel?.minimumScaleFactor = 0.5
             segmentTitleLabel?.adjustsFontSizeToFitWidth = true
@@ -285,13 +295,17 @@ class SegmentioCell: UICollectionViewCell {
         if style.isWithImage() {
             segmentImageView?.contentMode = options.imageContentMode
             segmentImageView?.image = content.image
+            if let imageTintColor = content.imageTintColor {
+                segmentImageView?.tintColor = imageTintColor
+            }
         }
         
+        overrideTextColor = content.overrideTextColor
         if style.isWithText() {
             segmentTitleLabel?.textAlignment = options.labelTextAlignment
             segmentTitleLabel?.numberOfLines = options.labelTextNumberOfLines
             let defaultState = options.states.defaultState
-            segmentTitleLabel?.textColor = defaultState.titleTextColor
+            segmentTitleLabel?.textColor = overrideTextColor ?? defaultState.titleTextColor
             segmentTitleLabel?.font = defaultState.titleFont
             segmentTitleLabel?.text = content.title
             segmentTitleLabel?.minimumScaleFactor = 0.5
